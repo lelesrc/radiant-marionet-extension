@@ -38,14 +38,9 @@ class Webservice < ActiveRecord::Base
     
     # Trying to get data from webservice
     begin
-      result = ""
       uri = URI.parse(url)
-      # XXX: use Marionet
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = (uri.scheme == "https")  # enable SSL/TLS
-      result = http.request_get(uri.path + '?' + uri.query).body
-      logger.debug("Webservice response:\n#{result}")
-      @data = Nokogiri::XML.parse(result)
+      marionet = Marionet.new(uri)
+      @data = marionet.data
     rescue => msg
       logger.error("\033[1;31mCan't get webservice's data: #{msg.to_s}\033[0m")
       return nil
