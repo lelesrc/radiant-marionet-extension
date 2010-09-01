@@ -39,5 +39,8 @@ module WebserviceTags
     webservice = tag.locals.webservice
     webservice.get_value(tag.attr['select']) if webservice
   end
+  
+  # XXX: create tag 'webservice:render' which renders the Marionet
+  # whereas 'webservice:content' would behave like now
 
 end

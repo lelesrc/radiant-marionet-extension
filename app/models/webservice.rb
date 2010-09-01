@@ -40,6 +40,7 @@ class Webservice < ActiveRecord::Base
     begin
       result = ""
       uri = URI.parse(url)
+      # XXX: use Marionet
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = (uri.scheme == "https")  # enable SSL/TLS
       result = http.request_get(uri.path + '?' + uri.query).body
