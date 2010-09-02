@@ -44,9 +44,11 @@
     </xsl:template>
 
     <!-- Rewrite links -->
+    <!--
     <xsl:template match="*[local-name()='a']">
         <xsl:copy-of select="marionet:link(.,$session)"/>
     </xsl:template>
+  -->
 
     <!-- Copy through everything that hasn't been modified by the processor -->
     <xsl:template match="text()|@*|*">
