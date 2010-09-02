@@ -5,14 +5,12 @@
 # See the file LICENSE included with the distribution for
 # software license details.
 #++
-require 'rexml/document'
-require 'xml/xslt'
+require 'nokogiri'
 require 'singleton'
 
 # Singleton class that performs XSL transformation to the HTML.
 class Marionet::Parser
   include Singleton
-  include REXML
   
   @@namespace = 'http://github.com/youleaf/rails-marionet'
   attr_reader :stylesheets
@@ -20,16 +18,15 @@ class Marionet::Parser
   # Loads the XSL files from disk to memory.
   # Singleton takes care they are read only once.
   def initialize()
-    body = Document.new( File.new( File.join(
-      File.dirname(__FILE__),'xsl','body.xsl')))
-    test = Document.new( File.new( File.join(
-      File.dirname(__FILE__),'xsl','test.xsl')))
     @stylesheets = { 
-      :body => body,
-      :test => test
+      :body => Nokogiri::XSLT( File.read( File.join( File.dirname(__FILE__),'xsl',
+        'body.xsl'))),
+      :test => Nokogiri::XSLT( File.read( File.join( File.dirname(__FILE__),'xsl',
+        'test.xsl')))
     }
   end
   
+=begin
   # link
   XML::XSLT.registerExtFunc(@@namespace, 'link') do |nodes,session|
     #logger.debug('link transformation')
@@ -59,13 +56,7 @@ class Marionet::Parser
   # href
   
   # form
-
-  # Creates a new transformer instance, from the static list of cached stylesheets.
-  def transformer_impl(stylesheet)
-    impl = XML::XSLT.new()
-    impl.xsl = @stylesheets[ stylesheet ]
-    return impl
-  end
+=end
 
   def logger # :nodoc:
     Marionet.logger
@@ -73,25 +64,11 @@ class Marionet::Parser
 
   class << self
 
-    # Perform XSL transformation on the html (REXML::Document) or (String),
-    # with the marionet portlet session (Marionet::Session).
-    # Session is a REXML::Element 'portlet-session'.
+    # Perform XSL transformation on the html (Nokogiri::XML).
+    # XXX: append session to the document
     def transform(doc, session=nil, stylesheet=:body)
-      #logger.debug self.instance.transformer
-      # create copy of the transformer attribute from instance. 
-      transformer = self.instance.transformer_impl(stylesheet)
-      logger.debug transformer
-
-      # append session to the document
-      head = XPath.first(doc,'//html')
-      if head and session
-        head << session.element
-      end
-
-      # prepare transformer with document
-      transformer.xml = doc
-
-      transformer.serve()
+      xslt = self.instance.stylesheets[stylesheet]
+      xslt.transform(doc)
     end
 
     def logger # :nodoc:

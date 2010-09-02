@@ -39,8 +39,7 @@ class Webservice < ActiveRecord::Base
     # Trying to get data from webservice
     begin
       uri = URI.parse(url)
-      marionet = Marionet.new(uri)
-      @data = marionet.data
+      @marionet = Marionet.new(uri)
     rescue => msg
       logger.error("\033[1;31mCan't get webservice's data: #{msg.to_s}\033[0m")
       return nil
@@ -48,12 +47,24 @@ class Webservice < ActiveRecord::Base
   end
   
   
-  # Get value by XPath from @data getter.
+  # Get value by XPath from @marionet.data getter.
+  # Works with <webservice:content> tag.
   def get_value(xpath)
-    if @data && @data.root
-      value = @data.at(xpath, @data.root.namespaces)
+    return "" unless @marionet
+    data = @marionet.data
+    if data && data.root
+      value = data.at(xpath, data.root.namespaces)
       value.blank? ? "" : value.text.to_s
     end
+  end
+  
+  # Render XXX
+  def render
+    unless @marionet
+      logger.warn 'Nothing to render'
+      return ""
+    end
+    @marionet.portlet # rendered already at init
   end
   
   

@@ -29,7 +29,7 @@ module WebserviceTags
    Shows some value from webservice response. It has only one attribute - @select@, 
    that contains XPath for getting values from response.
    
-   *Usage: (withing webservice tag)*
+   *Usage: (within webservice tag)*
    
    <pre><code><r:webservice name="webservice_title" [other attributes...]>
      <r:webservice:content select="//some/xpath" />
@@ -39,8 +39,19 @@ module WebserviceTags
     webservice = tag.locals.webservice
     webservice.get_value(tag.attr['select']) if webservice
   end
-  
-  # XXX: create tag 'webservice:render' which renders the Marionet
-  # whereas 'webservice:content' would behave like now
+
+  desc %{
+    Renders the webservice response "portletized".
+    
+    *Usage: (within webservice tag)*
+    
+    <pre><code><r:webservice name="webservice_title" [other attributes...]>
+      <r:webservice:render />
+    </r:webservice></code></pre>
+  }
+  tag 'webservice:render' do |tag|
+    webservice = tag.locals.webservice
+    webservice.render if webservice
+  end
 
 end
